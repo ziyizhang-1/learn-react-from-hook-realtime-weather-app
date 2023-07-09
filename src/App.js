@@ -9,6 +9,8 @@ import { ReactComponent as LoadingIcon } from './images/loading.svg';
 import { ReactComponent as RainIcon } from './images/rain.svg';
 import { ReactComponent as RefreshIcon } from './images/refresh.svg';
 
+import SunriseSunset from './utils/sunrise-sunset.json';
+
 const theme = {
   light: {
     backgroundColor: '#ededed',
@@ -231,12 +233,30 @@ const App = () => {
     observationTime,
     locationName,
     description,
+    weatherCode,
     windSpeed,
     temperature,
     rainPossibility,
     isLoading,
     comfortability,
   } = weatherElement;
+
+  let currentDate = new Date();
+  currentDate = "2022-"+String(currentDate.getMonth()+1).padStart(2, '0')+'-'+String(currentDate.getDate()).padStart(2, '0');
+  currentDate = "2022-07-31";
+  let sunrise;
+  let sunset;
+  SunriseSunset.forEach(obj => {
+    if (obj.locationName.includes(locationName)) {
+      obj.time.forEach(obj => {
+        if (obj.dataTime == currentDate) {
+           sunrise = obj.sunrise;
+           sunset = obj.sunset;
+        }
+      });
+    }
+  });
+  console.log([sunrise, sunset]);
 
   return (
     <ThemeProvider theme={theme[currentTheme]}>
@@ -250,7 +270,7 @@ const App = () => {
             <Temperature>
               {Math.round(temperature)} <Celsius>°C</Celsius>
             </Temperature>
-            <WeatherIcon />
+            <WeatherIcon weatherCode={weatherCode} time={20 >= new Date().getHours() >= 6 ? "day":"night"} />
           </CurrentWeather>
           <AirFlow>
             <AirFlowIcon /> {windSpeed} m/h

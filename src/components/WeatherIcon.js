@@ -75,14 +75,15 @@ const weatherCode2Type = (weatherCode) => {
     Object.entries(weatherTypes).find(([weatherType, weatherCodes]) =>
       weatherCodes.includes(Number(weatherCode))
     ) || [];
-
   return weatherType;
 };
 
-const WeatherIcon = () => {
+const WeatherIcon = (props) => {
+  let weatherType = weatherCode2Type(props.weatherCode);
+  let time = props.time;
   return (
     <IconContainer>
-      <DayCloudy />
+      {weatherIcons[time][weatherType]}
     </IconContainer>
   );
 };
