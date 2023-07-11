@@ -241,22 +241,13 @@ const App = () => {
     comfortability,
   } = weatherElement;
 
-  let currentDate = new Date();
-  currentDate = "2022-"+String(currentDate.getMonth()+1).padStart(2, '0')+'-'+String(currentDate.getDate()).padStart(2, '0');
-  currentDate = "2022-07-31";
-  let sunrise;
-  let sunset;
-  SunriseSunset.forEach(obj => {
-    if (obj.locationName.includes(locationName)) {
-      obj.time.forEach(obj => {
-        if (obj.dataTime == currentDate) {
-           sunrise = obj.sunrise;
-           sunset = obj.sunset;
-        }
-      });
-    }
-  });
-  console.log([sunrise, sunset]);
+  const currentDate = new Date();
+  const currentDate_s = String(currentDate.getFullYear())+'-'+String(currentDate.getMonth()+1).padStart(2, '0')+'-'+String(currentDate.getDate()).padStart(2, '0');
+
+  const res = SunriseSunset.find(obj => obj.locationName.includes(locationName)).time
+                          .find(obj => obj.dataTime == currentDate_s);
+  const sunrise = new Date(res.dataTime + ' ' + res.sunrise);
+  const sunset = new Date(res.dataTime + ' ' + res.sunset);
 
   return (
     <ThemeProvider theme={theme[currentTheme]}>
@@ -270,7 +261,7 @@ const App = () => {
             <Temperature>
               {Math.round(temperature)} <Celsius>°C</Celsius>
             </Temperature>
-            <WeatherIcon weatherCode={weatherCode} time={20 >= new Date().getHours() >= 6 ? "day":"night"} />
+            <WeatherIcon weatherCode={weatherCode} time={(currentDate >= sunrise && currentDate <= sunset) ? "day":"night"} />
           </CurrentWeather>
           <AirFlow>
             <AirFlowIcon /> {windSpeed} m/h
