@@ -8,7 +8,7 @@ import { ReactComponent as AirFlowIcon } from './images/airFlow.svg';
 import { ReactComponent as LoadingIcon } from './images/loading.svg';
 import { ReactComponent as RainIcon } from './images/rain.svg';
 import { ReactComponent as RefreshIcon } from './images/refresh.svg';
-
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import SunriseSunset from './utils/sunrise-sunset.json';
 
 const theme = {
@@ -194,7 +194,7 @@ const fetchWeatherForecast = () => {
 };
 
 const App = () => {
-  const [currentTheme, setCurrentTheme] = useState('light');
+  const [currentTheme, setCurrentTheme] = useState('dark');
   const [weatherElement, setWeatherElement] = useState({
     observationTime: new Date(),
     locationName: '',
@@ -225,10 +225,6 @@ const App = () => {
     });
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
   const {
     observationTime,
     locationName,
@@ -249,6 +245,14 @@ const App = () => {
   const sunrise = new Date(res.dataTime + ' ' + res.sunrise);
   const sunset = new Date(res.dataTime + ' ' + res.sunset);
 
+  const temp = useMotionValue(0);
+  const rounded = useTransform(temp, Math.round);
+  animate(temp, Math.round(temperature), { duration: 1 });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <ThemeProvider theme={theme[currentTheme]}>
       <Container>
@@ -259,7 +263,7 @@ const App = () => {
           </Description>
           <CurrentWeather>
             <Temperature>
-              {Math.round(temperature)} <Celsius>°C</Celsius>
+              <motion.div>{rounded}</motion.div> <Celsius>°C</Celsius>
             </Temperature>
             <WeatherIcon weatherCode={weatherCode} time={(currentDate >= sunrise && currentDate <= sunset) ? "day":"night"} />
           </CurrentWeather>
